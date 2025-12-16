@@ -1,28 +1,37 @@
-// Runner 인스턴스 가져오기
-const runner = Runner.instance_;
+// 1. [핵심 수정] runnerInstance 변수를 먼저 정의해야 오류가 안 납니다.
+var runnerInstance = runnerInstance;
 
-// 봇 로직 실행
-const botInterval = setInterval(() => {
-    // 1. 게임이 끝났다면 자동 재시작 (기존 코드 기능 반영)
-    if (runner.crashed) {
-        runner.restart();
+// 2. [무적 모드] 장애물에 부딪혀도 게임오버 함수가 작동하지 않게 만듭니다.
+runnerInstance.gameOver = function() {};
+
+// 3. [속도 조절] 원하시는 대로 속도를 설정합니다. (괄호를 사용하는 것이 정석입니다)
+// 봇이 반응할 수 있도록 적당히 빠른 100 정도로 설정했습니다. (원하면 숫자 변경 가능)
+runnerInstance.setSpeed(100); 
+
+// 4. [자동 점프 봇 로직]
+var botInterval = setInterval(function() {
+    
+    // 게임이 멈춰있거나 끝났다면 재시작
+    if (runnerInstance.crashed) {
+        runnerInstance.restart();
     }
 
-    // 2. 현재 화면에 장애물이 있는지 확인
-    const obstacles = runner.horizon.obstacles;
+    // 장애물 감지
+    var obstacles = runnerInstance.horizon.obstacles;
 
     if (obstacles.length > 0) {
-        const obstacle = obstacles[0];
+        var obstacle = obstacles[0];
         
-        // 3. 거리 계산 (속도가 빨라질수록 미리 점프해야 함)
-        // 기본 반응 거리 + 현재 속도 보정값
-        const safeDistance = 80 + (runner.currentSpeed * 15); 
+        // 거리 계산 (속도가 빨라져도 반응하도록 보정)
+        // 속도(currentSpeed)에 비례해서 미리 점프합니다.
+        var safeDistance = 80 + (runnerInstance.currentSpeed * 15); 
 
-        // 4. 장애물이 안전 거리 내로 들어오면 점프
-        // xPos는 장애물의 현재 위치
+        // 장애물이 다가오면 점프
         if (obstacle.xPos < safeDistance && obstacle.xPos > 0) {
-            // keydown 이벤트 대신 내부 함수를 직접 호출하여 더 빠르고 정확함
-            runner.tRex.startJump(runner.currentSpeed);
+            runnerInstance.tRex.startJump(runnerInstance.currentSpeed);
         }
     }
-}, 20); // 0.02초마다 감지
+}, 20);
+
+// 참고: 중력(gravity)을 0으로 하면 점프 후 내려오지 않아 봇이 고장나므로,
+// 봇 모드에서는 중력을 건드리지 않는 것이 좋습니다.

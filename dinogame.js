@@ -3,6 +3,7 @@ runnerInstance.gameOver = function() {};
 
 // 2. [속도 조절] 원하시는 대로 속도를 설정합니다. (괄호를 사용하는 것이 정석입니다)
 // 봇이 반응할 수 있도록 적당히 빠른 100 정도로 설정했습니다. (원하면 숫자 변경 가능)
+// runnerInstance.setSpeed(9999); <-- 매우 빠름 (그러나 깨짐)
 runnerInstance.setSpeed(100); 
 
 // 3. [자동 점프 봇 로직]
@@ -32,4 +33,5 @@ var botInterval = setInterval(function() {
 
 // 참고: 중력(gravity)을 0으로 하면 점프 후 내려오지 않아 봇이 고장나므로,
 // 봇 모드에서는 중력을 건드리지 않는 것이 좋습니다.
+
 

@@ -1,22 +1,28 @@
-var event = new Event('keydown');
-var inc=-30;
-event.keyCode = 32;//keys(Runner.keycodes.JUMP)[0];
-event.which = event.keyCode;
-event.altKey = false;
-event.ctrlKey = true;
-event.shiftKey = false;
-event.metaKey = false;
+// Runner 인스턴스 가져오기
+const runner = Runner.instance_;
 
-var ctx=document.getElementsByClassName("runner-canvas")[0].getContext('2d');
+// 봇 로직 실행
+const botInterval = setInterval(() => {
+    // 1. 게임이 끝났다면 자동 재시작 (기존 코드 기능 반영)
+    if (runner.crashed) {
+        runner.restart();
+    }
 
-var sec = setInterval(function(){
-if (Math.max(...ctx.getImageData(120,125,50+inc,1).data)==255)  document.dispatchEvent(event);
-if (Math.max(...ctx.getImageData(120,95,30+inc,1).data)==255) document.dispatchEvent(event);
-if (Runner.instance_.crashed) {inc=-30; Runner.instance_.restart()};
-if (Runner.instance_.paused) Runner.instance_.play();
-},2);
-    
-var sec = setInterval(function(){
-if (inc<100)inc=(inc+0.1)
-},300);
-    
+    // 2. 현재 화면에 장애물이 있는지 확인
+    const obstacles = runner.horizon.obstacles;
+
+    if (obstacles.length > 0) {
+        const obstacle = obstacles[0];
+        
+        // 3. 거리 계산 (속도가 빨라질수록 미리 점프해야 함)
+        // 기본 반응 거리 + 현재 속도 보정값
+        const safeDistance = 80 + (runner.currentSpeed * 15); 
+
+        // 4. 장애물이 안전 거리 내로 들어오면 점프
+        // xPos는 장애물의 현재 위치
+        if (obstacle.xPos < safeDistance && obstacle.xPos > 0) {
+            // keydown 이벤트 대신 내부 함수를 직접 호출하여 더 빠르고 정확함
+            runner.tRex.startJump(runner.currentSpeed);
+        }
+    }
+}, 20); // 0.02초마다 감지
